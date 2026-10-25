@@ -33,5 +33,34 @@ class ProductController extends Controller
         Product::create($request->all());
 
         return redirect('/products')->with('success', 'Produk berhasil ditambahkan!');
+
+    }
+
+    public function edit(Product $product)
+    {
+        $categories = Category::all();
+        return view('products.edit', compact('product', 'categories'));
+    }
+
+    public function update(Request $request, Product $product)
+    {
+        $request->validate([
+            'category_id' => 'required',
+            'sku' => 'required|unique:products,sku,' . $product->id,
+            'name' => 'required',
+            'price' => 'required|numeric',
+            'stock' => 'required|numeric',
+        ]);
+
+        $product->update($request->all());
+
+        return redirect('/products')->with('success', 'Produk berhasil diubah!');
+    }
+
+    public function destroy(Product $product)
+    {
+        $product->delete();
+
+        return redirect('/products')->with('success', 'Produk berhasil dihapus!');
     }
 }
