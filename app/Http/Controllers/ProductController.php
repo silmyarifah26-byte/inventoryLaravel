@@ -8,9 +8,16 @@ use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::with('category')->get();
+        $products = Product::with('category')
+            ->when($request->search, function ($query, $search) {
+                $query->where('name', 'like', "%{$search}%")
+                      ->orWhere('sku', 'like', "%{$search}%");
+            })
+            ->paginate(10)
+            ->withQueryString();
+
         return view('products.index', compact('products'));
     }
 
@@ -24,7 +31,7 @@ class ProductController extends Controller
     {
         $request->validate([
             'category_id' => 'required',
-            'sku' => 'required|unique:products',
+            'sku' => 'required|unique:products,sku',
             'name' => 'required',
             'price' => 'required|numeric',
             'stock' => 'required|numeric',
@@ -33,7 +40,6 @@ class ProductController extends Controller
         Product::create($request->all());
 
         return redirect('/products')->with('success', 'Produk berhasil ditambahkan!');
-
     }
 
     public function edit(Product $product)

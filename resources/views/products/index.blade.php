@@ -22,6 +22,17 @@
                     </div>
                 @endif
 
+                <!-- Form Pencarian -->
+                <form action="/products" method="GET" class="mb-3">
+                    <div class="input-group">
+                        <input type="text" name="search" class="form-control" placeholder="Cari nama produk atau SKU..." value="{{ request('search') }}">
+                        <button class="btn btn-outline-primary" type="submit">Cari</button>
+                        @if(request('search'))
+                            <a href="/products" class="btn btn-outline-secondary">Reset</a>
+                        @endif
+                    </div>
+                </form>
+
                 <table class="table table-bordered table-striped align-middle">
                     <thead class="table-dark">
                         <tr>
@@ -37,7 +48,7 @@
                     <tbody>
                         @forelse($products as $index => $product)
                             <tr>
-                                <td>{{ $index + 1 }}</td>
+                                <td>{{ $products->firstItem() + $index }}</td>
                                 <td>{{ $product->sku }}</td>
                                 <td>{{ $product->name }}</td>
                                 <td>{{ $product->category->name ?? '-' }}</td>
@@ -59,6 +70,11 @@
                         @endforelse
                     </tbody>
                 </table>
+
+                <!-- Link Paginasi -->
+                <div class="mt-3">
+                    {{ $products->links() }}
+                </div>
             </div>
         </div>
     </div>
